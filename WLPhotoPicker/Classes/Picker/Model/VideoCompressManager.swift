@@ -184,10 +184,18 @@ public class VideoCompressManager {
         assetWriter.startWriting()
         assetWriter.startSession(atSourceTime: .zero)
         
+        
+        let videoProgressWeight: TimeInterval = 0.5
+        let audioProgressWeight: TimeInterval = 0.5
+
+        var videoProgress: TimeInterval = 0
+        var audioProgress: TimeInterval = 0
+
         let dispatchGroup = DispatchGroup()
-        
-        let totalSeconds = avAsset.duration.seconds
-        
+                
+        let totalVideoSeconds = composition.duration.seconds
+        let totalAudioSeconds = audioTracks.count > 0 ? audioTracks[0].timeRange.duration.seconds : 0
+
         dispatchGroup.enter()
         assetWriterVideoInput.requestMediaDataWhenReady(on: videoQueue) {
             while assetWriterVideoInput.isReadyForMoreMediaData {
@@ -198,8 +206,9 @@ public class VideoCompressManager {
                 }
                 assetWriterVideoInput.append(sampleBuffer)
                 let timeStamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+                videoProgress = timeStamp.seconds / totalVideoSeconds
                 DispatchQueue.main.async {
-                    progress?(timeStamp.seconds / totalSeconds)
+                    progress?((videoProgress * videoProgressWeight) + (audioProgress * audioProgressWeight))
                 }
             }
         }
@@ -215,6 +224,11 @@ public class VideoCompressManager {
                         break
                     }
                     assetWriterAudioInput.append(sampleBuffer)
+                    let timeStamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+                    audioProgress = timeStamp.seconds / totalAudioSeconds
+                    DispatchQueue.main.async {
+                        progress?((videoProgress * videoProgressWeight) + (audioProgress * audioProgressWeight))
+                    }
                 }
             }
         }
@@ -227,6 +241,10 @@ public class VideoCompressManager {
             if let error = assetWriter.error {
                 self?.error = .underlying(error)
             }
+            DispatchQueue.main.async {
+                progress?(1)
+            }
+
             assetReader.cancelReading()
             assetWriter.finishWriting {
                 DispatchQueue.main.async {
