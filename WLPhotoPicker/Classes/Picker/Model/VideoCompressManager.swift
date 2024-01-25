@@ -258,7 +258,7 @@ public class VideoCompressManager {
         let videoExportSize = computeVideoExportSize()
         
         let supportHEVC = VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC)
-        var bitRate = Float(0.1 * videoExportSize.height * videoExportSize.width) * Float(videoComposition.frameDuration.timescale)
+        var bitRate = Float(videoExportSize.height * videoExportSize.width)//Float(0.1 * videoExportSize.height * videoExportSize.width) * Float(videoComposition.frameDuration.timescale)
         if !compressVideo, let assetVideoTrack = composition.tracks(withMediaType: .video).first {
             bitRate = assetVideoTrack.estimatedDataRate
         }
@@ -269,9 +269,11 @@ public class VideoCompressManager {
             AVVideoCodecKey: codec,
             AVVideoWidthKey: videoExportSize.width,
             AVVideoHeightKey: videoExportSize.height,
+            AVVideoScalingModeKey: AVVideoScalingModeResizeAspectFill,
             AVVideoCompressionPropertiesKey: [
                 AVVideoProfileLevelKey: profileLevel,
-                AVVideoAverageBitRateKey: bitRate
+                AVVideoAverageBitRateKey: bitRate,
+                AVVideoMaxKeyFrameIntervalKey: videoComposition.frameDuration.timescale
             ]
         ]
     }
