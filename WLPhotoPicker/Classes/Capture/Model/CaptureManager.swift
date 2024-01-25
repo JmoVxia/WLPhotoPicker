@@ -157,8 +157,8 @@ public class CaptureManager: NSObject {
     
     public func setupPreviewLayer(to superView: UIView) {
         let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer.videoGravity = .resizeAspect
-        previewLayer.frame = superView.layer.bounds
+        previewLayer.videoGravity = .resizeAspectFill
+        previewLayer.frame = superView.bounds
         superView.layer.addSublayer(previewLayer)
         self.previewLayer = previewLayer
     }

@@ -34,8 +34,8 @@ public class VideoCompressManager {
     
     public var error: VideoCompressError?
     
-    private var audioQueue = DispatchQueue(label: "com.WLPhotoPicker.DispatchQueue.VideoExportTool.Audio")
-    private var videoQueue = DispatchQueue(label: "com.WLPhotoPicker.DispatchQueue.VideoExportTool.Video")
+    private var audioQueue = DispatchQueue(label: "com.WLPhotoPicker.DispatchQueue.VideoExportTool.Audio", qos: .userInteractive)
+    private var videoQueue = DispatchQueue(label: "com.WLPhotoPicker.DispatchQueue.VideoExportTool.Video", qos: .userInteractive)
     
     private let composition = AVMutableComposition()
     private let videoComposition = AVMutableVideoComposition()
