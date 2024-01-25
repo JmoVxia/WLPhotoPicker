@@ -257,11 +257,13 @@ public class VideoCompressManager {
     private func videoWriterConfig() -> [String: Any]? {
         let videoExportSize = computeVideoExportSize()
         
-        let supportHEVC = VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC)
-        var bitRate = Float(videoExportSize.height * videoExportSize.width)//Float(0.1 * videoExportSize.height * videoExportSize.width) * Float(videoComposition.frameDuration.timescale)
-        if !compressVideo, let assetVideoTrack = composition.tracks(withMediaType: .video).first {
-            bitRate = assetVideoTrack.estimatedDataRate
+        var bitRate = Float(0.1 * videoExportSize.height * videoExportSize.width) * Float(videoComposition.frameDuration.timescale)
+        
+        if let assetVideoTrack = composition.tracks(withMediaType: .video).first {
+            bitRate = compressVideo ? min(assetVideoTrack.estimatedDataRate, bitRate) : assetVideoTrack.estimatedDataRate
         }
+        
+        let supportHEVC = VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC)
         let codec = supportHEVC ? AVVideoCodecType.hevc : .h264
         let profileLevel = supportHEVC ? kVTProfileLevel_HEVC_Main_AutoLevel as String : AVVideoProfileLevelH264MainAutoLevel
         
