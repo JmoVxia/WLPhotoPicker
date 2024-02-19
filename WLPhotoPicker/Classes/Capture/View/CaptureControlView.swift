@@ -56,10 +56,6 @@ class CaptureControlView: UIView {
         previewContentView.addGestureRecognizer(UIPinchGestureRecognizer(target: self, action: #selector(zoomPinchGes(_:))))
         previewContentView.backgroundColor = .clear
         addSubview(previewContentView)
-        previewContentView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.width.height.equalToSuperview()
-        }
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapGesture))
         tapGesture.isEnabled = captureConfig.allowTakingPhoto
@@ -70,10 +66,7 @@ class CaptureControlView: UIView {
         longPressGesture.minimumPressDuration = 0.2
         cameraButton.addGestureRecognizer(longPressGesture)
         addSubview(cameraButton)
-        cameraButton.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.bottom.equalTo(-60 - keyWindowSafeAreaInsets.bottom)
-        }
+        
         
         tipLabel.isHidden = true
         var text = ""
@@ -90,34 +83,52 @@ class CaptureControlView: UIView {
         tipLabel.font = UIFont.systemFont(ofSize: 13)
         tipLabel.textColor = .white
         addSubview(tipLabel)
-        tipLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.bottom.equalTo(cameraButton.snp.top).offset(-20)
-        }
+        
+        
         
         cancelButton.tintColor = .white
         cancelButton.setImage(BundleHelper.imageNamed("capture_back")?.withRenderingMode(.alwaysTemplate), for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonClick), for: .touchUpInside)
         addSubview(cancelButton)
-        cancelButton.snp.makeConstraints { make in
-            make.centerY.equalTo(cameraButton.snp.centerY)
-            make.right.equalTo(cameraButton.snp.centerX).multipliedBy(0.5)
-        }
+        
         
         changeCameraButton.tintColor = .white
         changeCameraButton.setImage(BundleHelper.imageNamed("capture_rotate_camera")?.withRenderingMode(.alwaysTemplate), for: .normal)
         changeCameraButton.addTarget(self, action: #selector(changeCameraButtonClick), for: .touchUpInside)
         addSubview(changeCameraButton)
-        changeCameraButton.snp.makeConstraints { make in
-            make.centerY.equalTo(cameraButton.snp.centerY)
-            make.left.equalTo(cameraButton.snp.centerX).multipliedBy(1.5)
-        }
+        
+        
+       
         
         focusImageView.isHidden = true
         focusImageView.frame = CGRect(origin: .zero, size: CGSize(width: 70, height: 70))
         focusImageView.image = BundleHelper.imageNamed("capture_focus")?.withRenderingMode(.alwaysTemplate)
         focusImageView.tintColor = .green
         addSubview(focusImageView)
+        
+        previewContentView.snp.makeConstraints { make in
+            make.left.top.right.equalToSuperview()
+            make.bottom.equalTo(cameraButton.snp.top).offset(-20)
+        }
+
+        cameraButton.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.bottom.equalTo(-60 - keyWindowSafeAreaInsets.bottom)
+        }
+        
+        tipLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.bottom.equalTo(previewContentView.snp.bottom).offset(-20)
+        }
+        cancelButton.snp.makeConstraints { make in
+            make.centerY.equalTo(cameraButton.snp.centerY)
+            make.right.equalTo(cameraButton.snp.centerX).multipliedBy(0.5)
+        }
+        
+        changeCameraButton.snp.makeConstraints { make in
+            make.centerY.equalTo(cameraButton.snp.centerY)
+            make.left.equalTo(cameraButton.snp.centerX).multipliedBy(1.5)
+        }
         
         layoutSubviews()
     }
