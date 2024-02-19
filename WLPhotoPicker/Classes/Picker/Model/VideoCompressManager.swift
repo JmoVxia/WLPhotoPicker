@@ -12,13 +12,13 @@ import VideoToolbox
 public class VideoCompressManager {
     
     // 视频压缩尺寸
-    public var compressSize: PickerVideoCompressSize = ._960x540
+    public var compressSize: PickerVideoCompressSize = ._1280x720
     
     // 视频导出格式
     public var videoExportFileType: PickerVideoExportFileType = .mp4
     
     // 视频压缩帧率，如果原视频帧率比导出帧率低，会使用视频原帧率
-    public var frameDuration: Float = 30 {
+    public var frameDuration: Float = 24 {
         didSet {
             updateComposition()
         }

@@ -66,7 +66,7 @@ class VideoCompressViewController: UIViewController {
     }
     
     @objc func beginCompress() {
-        guard let videoPath = Bundle.main.path(forResource: "IMG_0132", ofType: "MOV") else {
+        guard let videoPath = Bundle.main.path(forResource: "video", ofType: "mp4") else {
             return
         }
         
@@ -74,8 +74,7 @@ class VideoCompressViewController: UIViewController {
         if FileManager.default.fileExists(atPath: outputPath) {
             try? FileManager.default.removeItem(atPath: outputPath)
         }
-        
-        let manager = VideoCompressManager(avAsset: AVAsset(url: URL(fileURLWithPath: videoPath)), outputPath: outputPath)
+        let manager = CKDVideoCompress(inputPath: videoPath, outputPath: outputPath, config: .init(videoSize: .size960x540, exportFileType: .mp4, frameDuration: 24))
 //        manager.compressSize = ._1280x720
 //        manager.frameDuration = 24
 //        manager.videoExportFileType = .mp4
@@ -92,21 +91,21 @@ class VideoCompressViewController: UIViewController {
         manager.exportVideo { progress in
 //            print("=========\(String(format: "%.2lf%", progress * 100))==========")
             SVProgressHUD.showProgress(Float(progress))
-        } completion: { outputURL in
+        } completion: { result in
             let end = Date()
             print("==== 耗时 ====\(String(format: "%.2f", end.timeIntervalSince1970 - start.timeIntervalSince1970))s==========")
-            if let _ = manager.error {
-                SVProgressHUD.showError(withStatus: "压缩失败")
-            } else {
+            result.success { outputURL in
                 SVProgressHUD.dismiss()
                 print(outputURL)
-                let playerItem = AVPlayerItem(asset: AVAsset(url: outputURL))
+                let playerItem = AVPlayerItem(asset: AVAsset(url: URL(fileURLWithPath: outputURL)))
                 let player = AVPlayer(playerItem: playerItem)
                 let controller = AVPlayerViewController()
                 controller.player = player
                 self.present(controller, animated: true) {
                     player.play()
                 }
+            }.failure { error in
+                SVProgressHUD.showError(withStatus: "压缩失败")
             }
         }
 

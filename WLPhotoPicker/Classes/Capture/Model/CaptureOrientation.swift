@@ -41,20 +41,25 @@ class CaptureOrientationManager: NSObject {
             delegate?.captureOrientation(self, didUpdate: .up)
             return
         }
-        let sensitive = 0.77
+        
         let x = motion.gravity.x
         let y = motion.gravity.y
         
-        if y < 0 && fabs(y) > sensitive {
-            delegate?.captureOrientation(self, didUpdate: .up)
-        } else if y > sensitive {
-            delegate?.captureOrientation(self, didUpdate: .down)
-        }
+        let angle = atan2(y, x)
+        let threshold: Double = .pi / 4 // 45 degrees
         
-        if x < 0 && fabs(x) > sensitive {
-            delegate?.captureOrientation(self, didUpdate: .left)
-        } else if x > sensitive {
-            delegate?.captureOrientation(self, didUpdate: .right)
+        if abs(angle) < threshold {
+            if x > 0 {
+                delegate?.captureOrientation(self, didUpdate: .right)
+            } else {
+                delegate?.captureOrientation(self, didUpdate: .left)
+            }
+        } else {
+            if y > 0 {
+                delegate?.captureOrientation(self, didUpdate: .down)
+            } else {
+                delegate?.captureOrientation(self, didUpdate: .up)
+            }
         }
     }
     
